@@ -1,0 +1,11 @@
+{
+  "secret": "YOUR_WEBHOOK_SECRET",
+  "signal_id": "example-001",
+  "timestamp": "REPLACE_WITH_CURRENT_UTC_ISO8601",
+  "venue": "SIM_CEX",
+  "symbol": "BTCUSDT",
+  "side": "BUY",
+  "quantity": "0.01",
+  "price": "65000",
+  "strategy": "demo_signal"
+}
