@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="referrer" content="no-referrer">
+<title>TradeBridge Pro — Simulated Order Router</title>
+<style>
+:root{font-family:Inter,system-ui,-apple-system,Segoe UI,Arial,sans-serif;color:#eaf4ff;background:#090f1d}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at 80% 0%,#1b3152 0%,transparent 38%),#090f1d}
+main{max-width:1200px;margin:0 auto;padding:29px 22px 90px}
+header{display:flex;align-items:center;justify-content:space-between;gap:15px;flex-wrap:wrap}
+.brand{display:flex;gap:12px;align-items:center;font-size:24px;font-weight:850;letter-spacing:-.8px}
+.logo{display:grid;place-items:center;background:linear-gradient(130deg,#4febad,#2475eb);color:#091e24;width:44px;height:44px;border-radius:13px;font-size:25px}
+.pill{border:1px solid #387957;color:#74e9b0;border-radius:30px;padding:8px 12px;font-size:11px;letter-spacing:.12em;font-weight:800}
+h1{font-size:clamp(31px,4.6vw,48px);letter-spacing:-1.4px;margin:45px 0 9px;line-height:1.09}
+p{color:#9aaec7;line-height:1.6}strong{letter-spacing:-.3px}
+.toolbar{display:flex;gap:10px;margin-top:24px;flex-wrap:wrap;align-items:center}
+input{flex:1;min-width:245px;padding:13px 15px;background:#122039;color:white;border:1px solid #304563;border-radius:10px}
+button{font-weight:750;background:#44e1a2;color:#09251d;padding:13px 17px;border:0;border-radius:10px;cursor:pointer}
+button:hover{filter:brightness(1.12)}button.alt{background:#233854;color:#dbefff}
+button.danger{background:#f1a3a8;color:#45171a}
+.status{min-height:24px;color:#fdadb1;margin:8px 0 4px;font-size:13px}
+.cards{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;margin-top:19px}
+.card,.panel{background:#111c30;border:1px solid #293a57;border-radius:16px;padding:21px}
+.card small{display:block;color:#97aac5;font-size:12px;letter-spacing:.03em}
+.card strong{display:block;margin-top:13px;font-size:25px}
+.layout{display:grid;grid-template-columns:1.1fr 1fr;gap:17px;margin-top:17px}
+h2{font-size:18px;margin:0 0 16px}
+.scroll{overflow:auto}
+table{border-collapse:collapse;width:100%;font-size:13px}th{text-align:left;color:#8fa8c8;font-weight:600;font-size:12px}
+td,th{border-bottom:1px solid #283b54;padding:11px 8px;white-space:nowrap}
+td{color:#e4efff}.muted{color:#91a3bb}.tag{color:#77e9af;font-weight:700}.sell{color:#ffaab6}
+.warning{border-left:3px solid #d8a35e;background:#30271e;padding:11px 15px;border-radius:6px;font-size:13px;color:#eecfaf}
+.link{color:#62ebb4;text-decoration:none}footer{margin-top:26px;color:#8d9fb6;font-size:12px;line-height:1.7}
+@media(max-width:900px){.cards{grid-template-columns:repeat(2,minmax(0,1fr))}.layout{grid-template-columns:1fr}}
+@media(max-width:450px){.cards{grid-template-columns:1fr}.card strong{font-size:23px}main{padding:22px 14px 60px}}
+</style>
+</head>
+<body><main>
+<header><div class="brand"><div class="logo">⇄</div>TradeBridge <span style="color:#4be3aa">Pro</span></div><span class="pill">● SIMULATION ONLY / V0.1</span></header>
+<h1>Signals in. Risk checked.<br>Every result visible.</h1>
+<p>Broker-routing architecture with mock IBKR, MT5 and CEX venues. Explore event history, operator controls and simulated portfolio state.</p>
+<div class="warning">This is an educational local demo. It DOES NOT connect to IBKR, MT5, any cryptocurrency exchange or live market data.</div>
+<div class="toolbar"><input id="key" type="password" autocomplete="off" placeholder="Enter your local TB_OPERATOR_KEY">
+<button id="connect">Connect dashboard</button><button id="refresh" class="alt">Refresh</button>
+<button id="halt" class="danger">Halt routing</button><button id="resume" class="alt">Resume</button></div>
+<div class="status" id="message" role="status"></div>
+<div class="cards">
+<div class="card"><small>Routing mode</small><strong>SIMULATED</strong></div>
+<div class="card"><small>Operator control</small><strong id="state">—</strong></div>
+<div class="card"><small>Simulated orders (latest 100)</small><strong id="orders-count">—</strong></div>
+<div class="card"><small>Daily realized P&amp;L (fictional)</small><strong id="daily">—</strong></div>
+</div>
+<div class="layout"><section class="panel"><h2>Paper venue balances</h2><div class="scroll"><table><thead><tr><th>Mock venue</th><th>Simulated cash (USD)</th></tr></thead><tbody id="balances"><tr><td colspan="2" class="muted">Connect with your local API key.</td></tr></tbody></table></div></section>
+<section class="panel"><h2>Paper positions</h2><div class="scroll"><table><thead><tr><th>Mock venue</th><th>Symbol</th><th>Qty</th><th>Avg cost</th></tr></thead><tbody id="positions"><tr><td colspan="4" class="muted">No data loaded.</td></tr></tbody></table></div></section></div>
+<div class="panel" style="margin-top:17px"><h2>Recent simulated order activity</h2><div class="scroll"><table><thead><tr><th>Signal ID</th><th>Venue</th><th>Symbol</th><th>Side</th><th>Quantity</th><th>Alert price</th><th>Status</th></tr></thead><tbody id="orders"><tr><td colspan="7" class="muted">No data loaded.</td></tr></tbody></table></div></div>
+<div class="panel" style="margin-top:17px"><h2>Operator audit events</h2><div class="scroll"><table><thead><tr><th>Time (UTC)</th><th>Type</th><th>Signal</th><th>Event</th></tr></thead><tbody id="events"><tr><td colspan="4" class="muted">No data loaded.</td></tr></tbody></table></div></div>
+<footer>Read the <a class="link" href="/docs">API docs</a> or visit <a class="link" href="https://github.com/rajachanna/TradeBridge-Pro">GitHub source</a>. All order statuses are locally simulated and prices are supplied by webhooks, not market feeds. This page does not persist your API key.</footer>
+</main><script>
+(()=>{
+  let token="";
+  const $=(x)=>document.getElementById(x);
+  function td(r,x,cls){let c=document.createElement("td");c.textContent=String(x);if(cls)c.className=cls;r.appendChild(c)}
+  function table(id,data,fields){const parent=$(id);parent.replaceChildren();if(!data.length){const r=document.createElement("tr");const c=document.createElement("td");c.colSpan=fields.length;c.className="muted";c.textContent="No records yet";r.appendChild(c);parent.appendChild(r);return;}for(const obj of data){const r=document.createElement("tr");for(const key of fields){td(r,obj[key]??"—",key==="status"?"tag":key==="side"&&obj[key]==="SELL"?"sell":null)}parent.appendChild(r);}}
+  async function query(url,method="GET"){const res=await fetch(url,{method,cache:"no-store",headers:{"X-API-Key":token}});if(!res.ok)throw Error(res.status===401?"Wrong operator key.":"HTTP "+res.status);return await res.json()}
+  async function load(){if(!token){$("message").textContent="Enter TB_OPERATOR_KEY first.";return}
+    $("message").textContent="";
+    try{const [portfolio,orders,events]=await Promise.all([query("/api/portfolio"),query("/api/orders"),query("/api/events")]);
+      $("state").textContent=portfolio.halted?"HALTED":"ACTIVE";
+      $("orders-count").textContent=orders.orders.length;
+      const pnl=Number(portfolio.daily_realized_pnl_usd);
+      $("daily").textContent=Number.isFinite(pnl)?pnl.toLocaleString("en-US",{style:"currency",currency:"USD"}):"—";
+      const balances=portfolio.balances.map(x=>({...x,cash:Number(x.cash).toLocaleString("en-US",{style:"currency",currency:"USD"})}));
+      table("balances",balances,["venue","cash"]);
+      table("positions",portfolio.positions,["venue","symbol","quantity","avg_cost"]);
+      table("orders",orders.orders,["signal_id","venue","symbol","side","quantity","price","status"]);
+      table("events",events.events,["created_at","type","signal_id","message"]);
+    }catch(e){$("message").textContent=e.message;}
+  }
+  async function control(action){if(!token){$("message").textContent="Connect first.";return;}try{await query("/api/control/"+action,"POST");await load()}catch(e){$("message").textContent=e.message}}
+  $("connect").addEventListener("click",()=>{token=$("key").value;$("key").value="";load()});
+  $("key").addEventListener("keydown",e=>{if(e.key==="Enter")$("connect").click()});
+  $("refresh").addEventListener("click",load);
+  $("halt").addEventListener("click",()=>control("halt"));
+  $("resume").addEventListener("click",()=>control("resume"));
+})();
+</script></body></html>
