@@ -12,7 +12,7 @@
 [![License](https://img.shields.io/badge/License-MIT-64748b)](LICENSE)
 [![Python API tests](https://github.com/rajachanna/TradeBridge-Pro/actions/workflows/ci.yml/badge.svg)](https://github.com/rajachanna/TradeBridge-Pro/actions/workflows/ci.yml)
 
-**[Source code](src/tradebridge) · [Run the demo](scripts/demo.py) · [Technical case study](docs/CASE_STUDY.md) · [Client integration brief](docs/CLIENT_BRIEF.md) · [Discuss custom work](https://nextgentechdev.com)**
+**[Source code](src/tradebridge) · [Run the demo](scripts/demo.py) · [Read-only broker preflights](docs/BROKER_PREFLIGHT.md) · [Technical case study](docs/CASE_STUDY.md) · [Client brief](docs/CLIENT_BRIEF.md) · [Discuss custom work](https://nextgentechdev.com)**
 
 </div>
 
@@ -25,6 +25,21 @@ Moving from a TradingView alert to a broker order involves more than one API req
 **TradeBridge Pro is a focused demo of those engineering concerns.** It shows routing, idempotency, risk control and auditability without requiring a funded account. This is different from [TradeMesh AI](https://github.com/rajachanna/TradeMesh-AI), which explores broader portfolio infrastructure.
 
 **Scope warning:** This project does **not** connect to Interactive Brokers, MetaTrader 5, or any crypto exchange. `SIM_IBKR`, `SIM_MT5`, and `SIM_CEX` are local **mock venues**. No real, demo-account or live account orders are placed.
+
+### New: opt-in read-only IBKR & MT5 connectivity preflights
+
+The repository also includes **real provider API/terminal read-only diagnostic code**, designed to run *locally* against an **already authenticated IBKR Client Portal Gateway** or a **logged-in MT5 demo terminal**. These probes inspect paper/demo account visibility, mask account identifiers and do **not** place broker orders. **No real connection has been verified in this portfolio environment.**
+
+- [IBKR and MetaTrader 5 setup, security, and acceptance guide](docs/BROKER_PREFLIGHT.md)
+- [Preflight implementation](src/tradebridge/preflight.py) and [16 offline tests](tests/test_preflight.py)
+
+```bash
+# Run only on a configured machine after explicit opt-in
+export TB_ENABLE_READONLY_PREFLIGHT=YES
+python -m tradebridge.preflight --provider ibkr
+```
+
+A trusted local HTTPS certificate and authenticated IBKR Gateway are required. For MT5, see the [Windows demo-terminal instructions](docs/BROKER_PREFLIGHT.md#option-b-metatrader-5--demo-account-visibility-only). Preflight commands are separate from the simulated webhook router.
 
 ## What you can examine
 
@@ -163,7 +178,7 @@ pytest -q
 
 Test cases include authentication, mock venue isolation, duplicate-ID handling, changed-payload conflicts, invalid inputs, risk rejection, manual halt and resume, daily realized-loss blocking, timestamp validation and secrets excluded from event logs.
 
-See [tests/test_api.py](tests/test_api.py) and the [GitHub Actions workflow](.github/workflows/ci.yml). Review the Actions tab for actual execution results—**a workflow file alone is not a claim of passing CI**.
+See [tests/test_api.py](tests/test_api.py) and the [GitHub Actions workflow](.github/workflows/ci.yml). The read-only preflight has a separate [offline security-focused test suite](tests/test_preflight.py). Review the Actions tab for actual execution results—**a workflow file alone is not a claim of passing CI**.
 
 ## Implementation status
 
@@ -171,6 +186,7 @@ See [tests/test_api.py](tests/test_api.py) and the [GitHub Actions workflow](.gi
 | --- | --- |
 | Simulated order routing to three isolated mock venues | **Implemented** |
 | Risk checks, event log, operator API and dashboard | **Implemented** |
+| Local IBKR paper / MT5 demo **read-only** preflight modules | **Implemented; real connectivity not yet verified** |
 | Live market prices, broker-confirmed orders, fees/slippage | **Not implemented** |
 | IBKR paper-account API adapter | Planned |
 | MT5 demo-account API adapter | Planned |
