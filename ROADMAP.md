@@ -10,6 +10,13 @@
 - Halt / resume controls and audit events
 - Responsive operator dashboard and API tests
 
+## ✅ v0.2 groundwork — read-only broker connectivity (code and offline tests)
+
+- IBKR local Client Portal Gateway paper-account listing via GET-only endpoint
+- MT5 already-logged-in DEMO terminal account/connection checks
+- TLS verification, local-only IBKR target, masked account identifiers and explicit CLI opt-in
+- Offline fake-connector security tests; **real paper/demo connectivity not yet verified**
+
 ## 🔲 v0.2 — harden the simulator
 
 - Request rate limiting and HTTPS deployment guidance
