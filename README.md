@@ -10,8 +10,9 @@
 [![FastAPI](https://img.shields.io/badge/FastAPI-Backend-009688?logo=fastapi&logoColor=white)](#system-architecture)
 [![Mode](https://img.shields.io/badge/Order%20mode-SIMULATED%20ONLY-0f766e)](#implementation-status)
 [![License](https://img.shields.io/badge/License-MIT-64748b)](LICENSE)
+[![Python API tests](https://github.com/rajachanna/TradeBridge-Pro/actions/workflows/ci.yml/badge.svg)](https://github.com/rajachanna/TradeBridge-Pro/actions/workflows/ci.yml)
 
-**[Source code](src/tradebridge) · [Technical case study](docs/CASE_STUDY.md) · [Risk and security boundaries](SECURITY.md) · [Discuss custom work](https://nextgentechdev.com)**
+**[Source code](src/tradebridge) · [Run the demo](scripts/demo.py) · [Technical case study](docs/CASE_STUDY.md) · [Client integration brief](docs/CLIENT_BRIEF.md) · [Discuss custom work](https://nextgentechdev.com)**
 
 </div>
 
@@ -106,6 +107,16 @@ The Docker setup binds port 8000 to **127.0.0.1**, with a persistent volume for 
 - **OpenAPI/interactive docs:** http://127.0.0.1:8000/docs
 - **Health:** http://127.0.0.1:8000/health
 
+### A one-command, offline client demonstration
+
+After installing the dev dependencies, run:
+
+```bash
+python scripts/demo.py
+```
+
+This creates a temporary simulation database and prints the buy → duplicate → conflict → halt → blocked trade → resume → sell sequence. No credentials, broker accounts or internet access are needed. The demo is also checked in GitHub Actions.
+
 ### Demonstrate one simulated trade
 
 Use the webhook secret configured in your local environment:
@@ -116,7 +127,7 @@ curl -X POST http://127.0.0.1:8000/api/webhook \
   -d '{
     "secret": "YOUR_WEBHOOK_SECRET",
     "signal_id": "demo-unique-0001",
-    "timestamp": "2026-11-13T13:00:00+00:00",
+    "timestamp": "REPLACE_WITH_CURRENT_UTC_TIMESTAMP",
     "venue": "SIM_CEX",
     "symbol": "BTCUSDT",
     "side": "BUY",
@@ -126,7 +137,7 @@ curl -X POST http://127.0.0.1:8000/api/webhook \
   }'
 ```
 
-**Change `timestamp` to the current UTC time before submitting.** The demo intentionally rejects alerts older than 120 seconds or over 30 seconds into the future. This example uses fictional input prices and is not a live quote.
+**Change `timestamp` to the current UTC ISO-8601 time before submitting.** The demo intentionally rejects alerts older than 120 seconds or over 30 seconds into the future. This example uses fictional input prices and is not a live quote.
 
 Expected status: `SIMULATED_FILLED`. Resubmit the same `signal_id` and order instructions for `DUPLICATE`. Change the price but reuse that ID for HTTP **409 Conflict**.
 
