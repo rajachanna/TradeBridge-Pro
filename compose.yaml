@@ -1,0 +1,14 @@
+services:
+  tradebridge:
+    build: .
+    env_file: .env
+    environment:
+      TB_DB_PATH: /data/tradebridge.sqlite
+    ports:
+      - "127.0.0.1:8000:8000"
+    volumes:
+      - simulated-orders:/data
+    restart: unless-stopped
+
+volumes:
+  simulated-orders:
